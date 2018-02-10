@@ -17,20 +17,16 @@ def render_price_list():
 
 @app.route("/convert_price")
 def render_convert_price():
-    return str(convert_price(1, 'USD', 'GBP'))
+    result = str(convert_price(1, 'USD', 'GBP'))
+    return render_template('index.html', result=result)
 
 
 @app.route("/convert_many_prices")
 def render_convert_price_list():
-    return str(convert_many_prices([{'price': 1, 'source_currency': 'USD', 'target_currency': 'GBP'},
+    result = str(convert_many_prices([{'price': 1, 'source_currency': 'USD', 'target_currency': 'GBP'},
           {'price': 10, 'source_currency': 'GBP', 'target_currency': 'USD'},
           {'price': 1, 'source_currency': 'USD', 'target_currency': 'EUR'}]))
-
-
-@app.route("/hello/<string:name>/")
-def hello(name):
-    return render_template(
-        'index.html', name=name)
+    return render_template('index.html', result=result)
 
 
 if __name__ == "__main__":
