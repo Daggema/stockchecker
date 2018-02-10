@@ -1,19 +1,20 @@
 import requests, bs4
 
 
-def get_price(item, type):
-    if type == 'stock':
-        page = requests.get('https://www.marketwatch.com/investing/stock/{}'.format(item.lower()))
-        soup = bs4.BeautifulSoup(page.text, 'html.parser')
-        selector = 'body > div.container.wrapper.clearfix.j-quoteContainer.stock > div.content-region.region--' \
-                   'fixed > div.template.template--aside > div > div > div.intraday__data > h3 > bg-quote'
-    elif type == 'crypto':
+def get_price(item):
+    page = requests.get('https://www.marketwatch.com/investing/stock/{}'.format(item.lower()))
+    if 'lookup' in page.url:
         page = requests.get('https://www.coingecko.com/en/price_charts/{}/usd'.format(item.lower()))
         soup = bs4.BeautifulSoup(page.text, 'html.parser')
         selector = '#wrapper > div.container.price_charts > div.coingecko.row > div > div.coin-details.row > ' \
                    'div.col-md-5.market-value > div.coin-value > span'
+    else:
+        soup = bs4.BeautifulSoup(page.text, 'html.parser')
+        selector = 'body > div.container.wrapper.clearfix.j-quoteContainer.stock > div.content-region.region--' \
+                   'fixed > div.template.template--aside > div > div > div.intraday__data > h3 > bg-quote'
     elements = soup.select(selector)
     price = elements[0].text.strip()
+    price = price.replace(',', '')
     price = float(price.strip('$'))
     return price
 
@@ -44,7 +45,7 @@ def convert_many_prices(pricelist):
 
 
 
-
+print(get_price('bitcoin'))
 
 
 

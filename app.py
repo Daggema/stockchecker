@@ -6,11 +6,17 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-	return render_template('index.html')
-	
+    return render_template('index.html')
+
+
 @app.route("/get_price")
+def get_price_item_submit():
+    return render_template('submit_item_form.html')
+
+
+@app.route("/get_price", methods=['POST'])
 def render_price():
-    result = str(get_price('AAPL', 'stock'))
+    result = str(get_price(request.form['text']))
     return render_template('prices.html', result=result)
 
 
