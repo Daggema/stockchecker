@@ -1,6 +1,5 @@
 from flask import Flask, flash, redirect, render_template, request, session, abort
-from stock_prices import get_price, get_many_prices, convert_price, convert_many_prices
-
+from get_stock_prices import get_price, get_many_prices, convert_price, convert_many_prices
 app = Flask(__name__)
 
 
@@ -10,6 +9,7 @@ def index():
 
 
 @app.route("/get_price")
+@app.route("/get_many_prices")
 def get_price_item_submit():
     return render_template('submit_item_form.html')
 
@@ -20,10 +20,11 @@ def render_price():
     return render_template('prices.html', result=result)
 
 
-@app.route("/get_many_prices")
+@app.route("/get_many_prices", methods=['POST'])
 def render_price_list():
-    result = str(get_many_prices({'AAPL': 'stock','ripple': 'crypto'}))
+    result = str(get_many_prices(request.form['text']))
     return render_template('prices.html', result=result)
+
 
 @app.route("/convert_price")
 def render_convert_price():

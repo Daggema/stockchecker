@@ -1,28 +1,48 @@
 import requests, bs4
 
-
 def get_price(item):
     page = requests.get('https://www.marketwatch.com/investing/stock/{}'.format(item.lower()))
+    print('https://www.marketwatch.com/investing/stock/{}'.format(item.lower()))
     if 'lookup' in page.url:
+        print('crypto')
         page = requests.get('https://www.coingecko.com/en/price_charts/{}/usd'.format(item.lower()))
         soup = bs4.BeautifulSoup(page.text, 'html.parser')
         selector = '#wrapper > div.container.price_charts > div.coingecko.row > div > div.coin-details.row > ' \
                    'div.col-md-5.market-value > div.coin-value > span'
     else:
+        print('stock')
         soup = bs4.BeautifulSoup(page.text, 'html.parser')
         selector = 'body > div.container.wrapper.clearfix.j-quoteContainer.stock > div.content-region.region--' \
                    'fixed > div.template.template--aside > div > div > div.intraday__data > h3 > bg-quote'
-    elements = soup.select(selector)
-    price = elements[0].text.strip()
-    price = price.replace(',', '')
-    price = float(price.strip('$'))
+
+    if page.status_code == 404 or 'lookup' in page.url:
+        print(404)
+        price = '404 - page not found, please check your spelling for typos'
+    else:
+        elements = soup.select(selector)
+        if len(elements) == 0:
+            return page.url
+        price = elements[0].text.strip()
+        price = price.replace(',', '')
+        price = float(price.strip('$'))
     return price
 
 
-def get_many_prices(dictionary):
+get_price('rrp')
+
+
+def get_many_prices(items):
     prices = {}
-    for i in dictionary.items():
-        prices[i[0]] = get_price(i[0], i[1])
+    if ',' in items:
+        list = items.split(',')
+    else:
+        list = items.split(' ')
+    for i in list:
+        i.strip()
+        print(i)
+        print(type(i))
+        prices[i] = get_price(i)
+        print(prices)
     return prices
 
 
@@ -43,9 +63,6 @@ def convert_many_prices(pricelist):
             = convert_price(i['price'], i['source_currency'], i['target_currency'])
     return converted_prices
 
-
-
-print(get_price('bitcoin'))
 
 
 
