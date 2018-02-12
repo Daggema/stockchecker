@@ -2,21 +2,17 @@ import requests, bs4
 
 def get_price(item):
     page = requests.get('https://www.marketwatch.com/investing/stock/{}'.format(item.lower()))
-    print('https://www.marketwatch.com/investing/stock/{}'.format(item.lower()))
     if 'lookup' in page.url:
-        print('crypto')
         page = requests.get('https://www.coingecko.com/en/price_charts/{}/usd'.format(item.lower()))
         soup = bs4.BeautifulSoup(page.text, 'html.parser')
         selector = '#wrapper > div.container.price_charts > div.coingecko.row > div > div.coin-details.row > ' \
                    'div.col-md-5.market-value > div.coin-value > span'
     else:
-        print('stock')
         soup = bs4.BeautifulSoup(page.text, 'html.parser')
         selector = 'body > div.container.wrapper.clearfix.j-quoteContainer.stock > div.content-region.region--' \
                    'fixed > div.template.template--aside > div > div > div.intraday__data > h3 > bg-quote'
 
     if page.status_code == 404 or 'lookup' in page.url:
-        print(404)
         price = '404 - page not found, please check your spelling for typos'
     else:
         elements = soup.select(selector)
@@ -28,22 +24,9 @@ def get_price(item):
     return price
 
 
-get_price('rrp')
-
-
-def get_many_prices(items):
-    prices = {}
-    if ',' in items:
-        list = items.split(',')
-    else:
-        list = items.split(' ')
-    for i in list:
-        i.strip()
-        print(i)
-        print(type(i))
-        prices[i] = get_price(i)
-        print(prices)
-    return prices
+def get_many_prices(string):
+    items = _splitstring(string)
+    return {i: get_price(i) for i in items}
 
 
 def convert_price(price, source_currency, target_currency):
@@ -52,19 +35,29 @@ def convert_price(price, source_currency, target_currency):
     soup = bs4.BeautifulSoup(page.text, 'html.parser')
     elements = soup.select('#ucc-container > span.uccAmountWrap > span.uccResultAmount')
     conversion_rate = float(elements[0].text.strip())
-    converted_price = price * conversion_rate
+    converted_price = float(price) * conversion_rate
     return converted_price
 
 
 def convert_many_prices(pricelist):
     converted_prices = {}
-    for i in pricelist:
-        converted_prices['{0} {1} to {2} conversion'.format(i['price'], i['source_currency'], i['target_currency'])] \
-            = convert_price(i['price'], i['source_currency'], i['target_currency'])
+    quantities = pricelist['quantities']
+    sources = pricelist['sources']
+    targets = pricelist['targets']
+    args = zip(_splitstring(quantities), _splitstring(sources), _splitstring(targets))
+    for i in args:
+        print(i)
+        converted_prices['{0} {1} to {2} conversion'.format(i[0], i[1], i[2])] = convert_price(i[0], i[1], i[2])
+        print(converted_prices)
+    print('FINAL DICT', converted_prices)
     return converted_prices
 
 
-
+def _splitstring(string):
+    if ',' in string:
+        return string.split(', ')
+    else:
+        return string.split()
 
 
 

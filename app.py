@@ -8,6 +8,9 @@ def index():
     return render_template('index.html')
 
 
+# GET PRICES ####################################################################
+
+
 @app.route("/get_price")
 @app.route("/get_many_prices")
 def get_price_item_submit():
@@ -26,17 +29,30 @@ def render_price_list():
     return render_template('prices.html', result=result)
 
 
+# CONVERT PRICES ################################################################
+
+
 @app.route("/convert_price")
+def get_price_submit():
+    return render_template('submit_price_form.html')
+
+
+@app.route("/convert_price", methods=['POST'])
 def render_convert_price():
-    result = str(convert_price(1, 'USD', 'GBP'))
+    print(request.form)
+    result = str(convert_price(request.form['quantity'], request.form['source currency'],
+                               request.form['target currency']))
     return render_template('prices.html', result=result)
 
 
 @app.route("/convert_many_prices")
+def get_multi_price_submit():
+    return render_template('submit_multi_price_form.html')
+
+
+@app.route("/convert_many_prices", methods=['POST'])
 def render_convert_price_list():
-    result = str(convert_many_prices([{'price': 1, 'source_currency': 'USD', 'target_currency': 'GBP'},
-          {'price': 10, 'source_currency': 'GBP', 'target_currency': 'USD'},
-          {'price': 1, 'source_currency': 'USD', 'target_currency': 'EUR'}]))
+    result = str(convert_many_prices(request.form))
     return render_template('prices.html', result=result)
 
 
