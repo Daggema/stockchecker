@@ -55,22 +55,3 @@ def _splitstring(string):
         return string.split(', ')
     else:
         return string.split()
-
-
-
-
-'''items = {'AAPL': 'stock','ripple': 'crypto'}
-itemlist = get_many_prices(items)
-
-dollars = convert_price(1, 'USD', 'GBP')
-#print(dollars)
-
-prices = [{'price': 1, 'source_currency': 'USD', 'target_currency': 'GBP'},
-          {'price': 10, 'source_currency': 'GBP', 'target_currency': 'USD'},
-          {'price': 1, 'source_currency': 'USD', 'target_currency': 'EUR'}]
-
-#print(convert_many_prices(prices))
-
-print(get_price('AAPL', 'stock'))
-print(convert_price(154.7, 'USD', 'GBP'))
-convert_price(get_price('AAPL', 'stock'), 'USD', 'GBP')'''
