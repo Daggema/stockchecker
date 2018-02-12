@@ -1,9 +1,9 @@
 import requests, bs4
 
-def get_price(item):
-    page = requests.get('https://www.marketwatch.com/investing/stock/{}'.format(item.lower()))
+def get_price(string):
+    page = requests.get('https://www.marketwatch.com/investing/stock/{}'.format(string.lower()))
     if 'lookup' in page.url:
-        page = requests.get('https://www.coingecko.com/en/price_charts/{}/usd'.format(item.lower()))
+        page = requests.get('https://www.coingecko.com/en/price_charts/{}/usd'.format(string.lower()))
         soup = bs4.BeautifulSoup(page.text, 'html.parser')
         selector = '#wrapper > div.container.price_charts > div.coingecko.row > div > div.coin-details.row > ' \
                    'div.col-md-5.market-value > div.coin-value > span'
@@ -39,17 +39,14 @@ def convert_price(price, source_currency, target_currency):
     return converted_price
 
 
-def convert_many_prices(pricelist):
+def convert_many_prices(price_dict):
     converted_prices = {}
-    quantities = pricelist['quantities']
-    sources = pricelist['sources']
-    targets = pricelist['targets']
+    quantities = price_dict['quantities']
+    sources = price_dict['sources']
+    targets = price_dict['targets']
     args = zip(_splitstring(quantities), _splitstring(sources), _splitstring(targets))
     for i in args:
-        print(i)
         converted_prices['{0} {1} to {2} conversion'.format(i[0], i[1], i[2])] = convert_price(i[0], i[1], i[2])
-        print(converted_prices)
-    print('FINAL DICT', converted_prices)
     return converted_prices
 
 
