@@ -13,7 +13,7 @@ def get_price(string):
                    'fixed > div.template.template--aside > div > div > div.intraday__data > h3 > bg-quote'
 
     if page.status_code == 404 or 'lookup' in page.url:
-        price = '404 - page not found, please check your spelling for typos'
+        return '404 - page not found'
     else:
         elements = soup.select(selector)
         if len(elements) == 0:
@@ -32,7 +32,13 @@ def get_many_prices(string):
 def convert_price(price, source_currency, target_currency):
     page = requests.get('http://www.xe.com/currencyconverter/convert/?Amount=1&From={0}&To={1}'
                         .format(source_currency.lower(), target_currency.lower()))
+    if page.status_code == 404:
+        return '404 - page not found'
     soup = bs4.BeautifulSoup(page.text, 'html.parser')
+    check_converter = soup.select('#content > div.module.clearfix.quickFixesTopModule.clearfix > '
+                            'div.uccResultContainer.quickFixesTopModule-left > h1')
+    if str(check_converter[0]) == '<h1>XE Currency Converter: USD to USD</h1>':
+        return '404 - page not found'
     elements = soup.select('#ucc-container > span.uccAmountWrap > span.uccResultAmount')
     conversion_rate = float(elements[0].text.strip())
     converted_price = float(price) * conversion_rate

@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>404</title>
+</head>
+
+<body>
+    {% block body %}
+    <h1>404</h1>
+    <h2>Sorry, Page Not Found</h2>
+    <p>Please check your information for any errors:<br>
+    {{missing_items}}</p>
+    {% endblock %}
+</body>
+</html>

@@ -12,21 +12,35 @@ def index():
 
 
 @app.route("/get_price")
-@app.route("/get_many_prices")
 def get_price_item_submit():
     return render_template('submit_item_form.html')
 
 
 @app.route("/get_price", methods=['POST'])
 def render_price():
-    result = str(get_price(request.form['text']))
-    return render_template('prices.html', result=result)
+    result = get_price(request.form['text'])
+    if result == '404 - page not found':
+        return render_template('404.html', missing_items=request.form['text'])
+    else:
+        return render_template('prices.html', result=result)
+
+
+@app.route("/get_many_prices")
+def get_multi_price_item_submit():
+    return render_template('submit_multi_items_form.html')
 
 
 @app.route("/get_many_prices", methods=['POST'])
 def render_price_list():
-    result = str(get_many_prices(request.form['text']))
-    return render_template('prices.html', result=result)
+    missing_items = []
+    result = get_many_prices(request.form['text'])
+    for i in result.items():
+        if i[1] == '404 - page not found':
+            missing_items.append(i)
+    if len(missing_items) > 0:
+        return render_template('404.html', missing_items=missing_items)
+    else:
+        return render_template('prices.html', result=result)
 
 
 # CONVERT PRICES ################################################################
@@ -40,9 +54,12 @@ def get_price_submit():
 @app.route("/convert_price", methods=['POST'])
 def render_convert_price():
     print(request.form)
-    result = str(convert_price(request.form['quantity'], request.form['source currency'],
-                               request.form['target currency']))
-    return render_template('prices.html', result=result)
+    result = convert_price(request.form['quantity'], request.form['source currency'],
+                           request.form['target currency'])
+    if result == '404 - page not found':
+        return render_template('404.html', missing_items=request.form)
+    else:
+        return render_template('convert_price.html', result=result)
 
 
 @app.route("/convert_many_prices")
@@ -52,8 +69,15 @@ def get_multi_price_submit():
 
 @app.route("/convert_many_prices", methods=['POST'])
 def render_convert_price_list():
-    result = str(convert_many_prices(request.form))
-    return render_template('prices.html', result=result)
+    missing_items = []
+    result = convert_many_prices(request.form)
+    for i in result.items():
+        if i[1] == '404 - page not found':
+            missing_items.append(i)
+    if len(missing_items) > 0:
+        return render_template('404.html', missing_items=missing_items)
+    else:
+        return render_template('convert_price.html', result=result)
 
 
 if __name__ == "__main__":
